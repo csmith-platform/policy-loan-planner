@@ -16,7 +16,10 @@
         <span>Clear payments. Flexible payoff.</span>
       </div>
     </div>
-    <button class="button button-quiet" id="resetButton" type="button">Reset plan</button>
+    <div class="header-actions">
+      <span class="user-pill" id="currentUser">Signing in…</span>
+      <button class="button button-quiet" id="resetButton" type="button">Reset terms</button>
+    </div>
   </header>
 
   <main>
@@ -30,6 +33,7 @@
       <button class="tab is-active" type="button" data-tab="planner" aria-selected="true">Plan overview</button>
       <button class="tab" type="button" data-tab="schedule" aria-selected="false">Amortization schedule <span id="scheduleCount" class="tab-count"></span></button>
     </nav>
+    <div class="storage-status" id="storageStatus" role="status">Connecting to the shared loan ledger…</div>
 
     <section class="tab-panel is-active" id="plannerPanel">
       <div class="planner-grid">
@@ -103,9 +107,10 @@
             </div>
           </div>
           <form class="extra-form" id="extraPaymentForm">
+            <label class="field"><span>Payment type</span><select id="paymentType"><option value="extra">Extra payment</option><option value="manual">Manual payment</option></select></label>
             <label class="field"><span>Amount</span><div class="input-shell"><span class="prefix">$</span><input id="extraAmount" type="number" min="0.01" step="0.01" placeholder="250.00" required /></div></label>
             <label class="field"><span>Date</span><input id="extraDate" type="date" required /></label>
-            <button class="button button-primary" type="submit">Add extra payment</button>
+            <button class="button button-primary" type="submit">Record payment</button>
           </form>
           <p class="form-note">An extra payment is applied on the first scheduled payment date on or after the date entered.</p>
           <div class="extras-empty" id="extrasEmpty">No extra payments yet.</div>
@@ -125,7 +130,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Payment date</th><th>Opening balance</th><th>Interest</th><th>Scheduled payment</th><th>Extra payment</th><th>Principal</th><th>Closing balance</th></tr></thead>
+          <thead><tr><th>#</th><th>Payment date</th><th>Opening balance</th><th>Interest</th><th>Scheduled payment</th><th>Other payment</th><th>Principal</th><th>Closing balance</th><th>Status</th><th>Action</th></tr></thead>
           <tbody id="scheduleBody"></tbody>
         </table>
       </div>
