@@ -7,10 +7,16 @@
     { "pattern": "loan.traderclay.com", "custom_domain": true }
   ],
   "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "policy-loan-planner",
+      "database_id": "dfd85877-9fb8-405f-b2cd-7b2967f6c255"
+    }
+  ],
   "vars": {
     "OWNER_EMAIL": "csmith.ab@gmail.com",
     "ALLOWED_EMAILS": "csmith.ab@gmail.com,katsmith430@gmail.com"
   },
   "observability": { "enabled": true }
 }
-
