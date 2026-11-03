@@ -3,6 +3,9 @@
   "name": "policy-loan-planner",
   "main": "./src/worker.js",
   "compatibility_date": "2026-11-02",
+  "routes": [
+    { "pattern": "loan.traderclay.com", "custom_domain": true }
+  ],
   "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
   "vars": {
     "OWNER_EMAIL": "csmith.ab@gmail.com",
