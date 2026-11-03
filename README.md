@@ -30,7 +30,7 @@ Connect this repository to a Cloudflare Worker build or run `npm run deploy`. Ad
 
 ### 3. Add the custom domain
 
-Attach `loan.claysmith.ca` as the Worker's custom domain. The `claysmith.ca` zone must be active in the same Cloudflare account.
+The Wrangler configuration attaches `loan.traderclay.com` as the Worker's custom domain. Because `traderclay.com` is already an active Cloudflare zone, Cloudflare can create the DNS record and certificate during deployment. Remove any existing DNS record for `loan.traderclay.com` before the first deployment if that hostname is already in use.
 
 ### 4. Protect all traffic with Access
 
