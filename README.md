@@ -1,38 +1,49 @@
 # Loan Planner
 
-A responsive, browser-based loan amortization calculator with support for dated extra payments.
+A protected Cloudflare Worker application for maintaining a shared family-loan amortization schedule. Static assets and the authenticated API deploy together, while Cloudflare D1 stores the loan terms and payment-event audit trail.
 
-## Features
+## Stored records
 
-- Configurable loan amount, interest rate, term in years and months, payment frequency, and first payment date
-- Live payment, interest, payoff date, and payment-count summaries
-- Full amortization schedule
-- Multiple dated extra payments with automatic schedule recalculation
-- Interest and time-saved comparison
-- CSV schedule export
-- Browser-local persistence and reset controls
+- One shared loan record
+- Extra and manual payments
+- Missed scheduled-payment markers
+- Creator and voiding identity from Cloudflare Access
+- Creation and voiding timestamps
 
-## Run locally
+Future amortization rows are calculated rather than stored. Payment records are voided instead of deleted so the audit history remains available.
 
-The application is plain HTML, CSS, and JavaScript with no build step.
+## Cloudflare setup
 
-1. Open the `dist` directory.
-2. Serve it with any static web server, for example `python -m http.server 8000`.
-3. Visit `http://localhost:8000`.
+### 1. Create and initialize D1
 
-Opening `dist/index.html` directly also works in most browsers.
+```sh
+npm install
+npm run db:create
+npm run db:migrate:remote
+```
 
-## Deployment
+The migration inserts the initial $5,552.75, 10%, five-year biweekly loan.
 
-Publish the contents of `dist/` with any static host, including GitHub Pages or Cloudflare Pages.
+### 2. Deploy the Worker
 
-## Data and authentication
+Connect this repository to a Cloudflare Worker build or run `npm run deploy`. Add a D1 binding to the Worker with variable name `DB` and database `policy-loan-planner`.
 
-Loan inputs and extra payments are stored in the visitor's browser using `localStorage`. They are not synchronized between devices or users. The application itself does not provide authentication; configure access through the selected hosting provider if required.
+### 3. Add the custom domain
+
+Attach `loan.claysmith.ca` as the Worker's custom domain. The `claysmith.ca` zone must be active in the same Cloudflare account.
+
+### 4. Protect all traffic with Access
+
+In **Workers & Pages → policy-loan-planner → Access**, protect **all traffic**. Configure email one-time PIN authentication and allow only:
+
+- `csmith.ab@gmail.com`
+- `katsmith430@gmail.com`
+
+Worker-level protection covers the static files, API, custom domain, `workers.dev` hostname, and previews. The API also checks the authenticated email against `ALLOWED_EMAILS`.
 
 ## Calculation convention
 
-The calculator uses the nominal annual interest rate divided by the selected number of payment periods per year. Extra payments are applied on the first scheduled payment date on or after the entered date.
+The nominal annual rate is divided by the selected payment periods per year. Extra and manual payments are applied on the first scheduled payment date on or after their recorded date. A missed-payment marker disables that scheduled payment and leaves the unpaid interest in the balance.
 
-This is a planning tool. Confirm the lender's interest and payment-processing conventions before relying on its results.
+This is a planning tool. Confirm the lender's conventions before relying on its results.
 
