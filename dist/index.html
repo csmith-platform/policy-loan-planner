@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="A private family loan planner with assigned loans, payment tracking, and amortization schedules." />
   <title>Loan Planner</title>
+  <link rel="icon" type="image/png" href="https://claytonsmith.ca/assets/images/cs-logo-fav.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true">LP</span>
+      <img class="brand-mark" src="https://claytonsmith.ca/assets/images/cs-logo-fav.png" alt="" width="39" height="39" />
       <div><strong>Loan Planner</strong><span>Private family loan ledgers</span></div>
     </div>
     <div class="header-actions">
-      <span class="user-pill" id="currentUser">Signing in…</span>
       <button class="button button-primary owner-only" id="newLoanButton" type="button" hidden>New loan</button>
+      <span class="user-pill" id="currentUser">Signing in…</span>
+      <a class="button button-quiet logout-link" href="/cdn-cgi/access/logout">Log out</a>
     </div>
   </header>
 

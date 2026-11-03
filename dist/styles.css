@@ -20,7 +20,7 @@ button { cursor: pointer; }
 
 .site-header { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(22px, 5vw, 72px); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand-mark { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 12px; background: var(--green); color: white; font-weight: 800; font-size: 13px; letter-spacing: .04em; }
+.brand-mark { width: 39px; height: 39px; display: block; border-radius: 12px; background: white; object-fit: cover; }
 .brand div { display: grid; gap: 2px; }
 .brand strong { font-size: 15px; }
 .brand span:last-child { font-size: 12px; color: var(--muted); }
@@ -104,6 +104,7 @@ input:disabled, select:disabled { cursor: not-allowed; background: #f2f5f3; colo
 .button-primary:hover { background: #15563f; }
 .button-secondary { background: white; color: var(--green); border-color: #b9ccc3; }
 .button-quiet { background: transparent; border-color: var(--line); color: var(--muted); }
+.logout-link { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; text-decoration: none; white-space: nowrap; }
 .extras-empty { margin-top: 22px; padding: 18px; border: 1px dashed #cbd7d1; border-radius: 12px; color: var(--muted); text-align: center; }
 .extras-list { margin-top: 20px; display: grid; gap: 10px; }
 .extra-item { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 16px; border-radius: 12px; background: var(--gold-soft); border: 1px solid #f2ddb4; }
