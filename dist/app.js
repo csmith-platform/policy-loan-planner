@@ -6,7 +6,7 @@ const frequencyConfig = {
   monthly: { periods: 12, label: "every month" },
 };
 
-const defaults = { amount: 5552.75, rate: 10, term: 5, frequency: "biweekly", firstDate: "2026-11-13" };
+const defaults = { amount: 5552.75, rate: 10, termYears: 5, termMonths: 0, frequency: "biweekly", firstDate: "2026-11-13" };
 let extras = loadExtras();
 let currentSchedule = [];
 
@@ -46,7 +46,8 @@ function readInputs() {
   return {
     amount: Math.max(0, Number($("loanAmount").value)),
     rate: Math.max(0, Number($("interestRate").value)) / 100,
-    term: Math.max(.1, Number($("loanTerm").value)),
+    termYears: Math.max(0, Math.floor(Number($("loanTermYears").value))),
+    termMonths: Math.min(11, Math.max(0, Math.floor(Number($("loanTermMonths").value)))),
     frequency: $("frequency").value,
     firstDate: $("firstPaymentDate").value,
   };
@@ -54,7 +55,8 @@ function readInputs() {
 
 function calculate(inputs, includeExtras = true) {
   const config = frequencyConfig[inputs.frequency];
-  const plannedCount = Math.max(1, Math.round(inputs.term * config.periods));
+  const totalMonths = Math.max(1, inputs.termYears * 12 + inputs.termMonths);
+  const plannedCount = Math.max(1, Math.round(totalMonths * config.periods / 12));
   const payment = regularPayment(inputs.amount, inputs.rate, config.periods, plannedCount);
   const start = parseDate(inputs.firstDate);
   let balance = round(inputs.amount);
@@ -140,7 +142,11 @@ function loadInputs() {
     if (!saved) return;
     $("loanAmount").value = saved.amount;
     $("interestRate").value = round(saved.rate * 100);
-    $("loanTerm").value = saved.term;
+    const savedTotalMonths = saved.termYears !== undefined
+      ? saved.termYears * 12 + (saved.termMonths || 0)
+      : Math.round((saved.term || defaults.termYears) * 12);
+    $("loanTermYears").value = Math.floor(savedTotalMonths / 12);
+    $("loanTermMonths").value = savedTotalMonths % 12;
     $("frequency").value = saved.frequency;
     $("firstPaymentDate").value = saved.firstDate;
   } catch {}
@@ -196,7 +202,8 @@ $("resetButton").addEventListener("click", () => {
   extras = [];
   $("loanAmount").value = defaults.amount;
   $("interestRate").value = defaults.rate;
-  $("loanTerm").value = defaults.term;
+  $("loanTermYears").value = defaults.termYears;
+  $("loanTermMonths").value = defaults.termMonths;
   $("frequency").value = defaults.frequency;
   $("firstPaymentDate").value = defaults.firstDate;
   $("extraDate").value = defaults.firstDate;
