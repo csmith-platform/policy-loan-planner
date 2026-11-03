@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 # Loan Planner
 
 A responsive, browser-based loan amortization calculator with support for dated extra payments.
