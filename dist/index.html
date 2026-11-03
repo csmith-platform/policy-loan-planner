@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Interactive loan amortization planner with dated extra payments." />
+  <meta name="description" content="A private family loan planner with assigned loans, payment tracking, and amortization schedules." />
   <title>Loan Planner</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,134 +11,136 @@
   <header class="site-header">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">LP</span>
-      <div>
-        <strong>Loan Planner</strong>
-        <span>Clear payments. Flexible payoff.</span>
-      </div>
+      <div><strong>Loan Planner</strong><span>Private family loan ledgers</span></div>
     </div>
     <div class="header-actions">
       <span class="user-pill" id="currentUser">Signing in…</span>
-      <button class="button button-quiet" id="resetButton" type="button">Reset terms</button>
+      <button class="button button-primary owner-only" id="newLoanButton" type="button" hidden>New loan</button>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <p class="eyebrow">LOAN CALCULATOR</p>
-      <h1>See every payment, then see what an extra payment changes.</h1>
-      <p class="hero-copy">Set the loan terms, add one or more dated extra payments, and the full schedule recalculates instantly.</p>
+      <p class="eyebrow">FAMILY LOAN PORTAL</p>
+      <h1>Every loan, payment, and payoff date in one place.</h1>
+      <p class="hero-copy">Select an assigned loan, record what happened, and keep the amortization schedule current.</p>
     </section>
 
-    <nav class="tabs" aria-label="Loan planner views">
-      <button class="tab is-active" type="button" data-tab="planner" aria-selected="true">Plan overview</button>
-      <button class="tab" type="button" data-tab="schedule" aria-selected="false">Amortization schedule <span id="scheduleCount" class="tab-count"></span></button>
-    </nav>
-    <div class="storage-status" id="storageStatus" role="status">Connecting to the shared loan ledger…</div>
+    <section class="loan-switcher" aria-label="Loan selection">
+      <label class="loan-select-field">
+        <span>Viewing loan</span>
+        <select id="loanSelect" aria-label="Select a loan"></select>
+      </label>
+      <div class="loan-identity">
+        <span class="loan-status" id="loanStatus">Active</span>
+        <div><strong id="selectedLoanName">Loading loans…</strong><span id="selectedBorrower"></span></div>
+      </div>
+    </section>
 
-    <section class="tab-panel is-active" id="plannerPanel">
-      <div class="planner-grid">
-        <form class="panel terms-panel" id="loanForm">
-          <div class="panel-heading">
-            <div>
-              <p class="section-kicker">LOAN DETAILS</p>
-              <h2>Build the payment plan</h2>
+    <div class="storage-status" id="storageStatus" role="status">Connecting to your loan ledgers…</div>
+
+    <section class="empty-state" id="emptyState" hidden>
+      <p class="section-kicker">NO ASSIGNED LOANS</p>
+      <h2>There is nothing to show yet.</h2>
+      <p>An owner can create a loan and assign it to your signed-in email address.</p>
+    </section>
+
+    <div id="loanWorkspace" hidden>
+      <nav class="tabs" aria-label="Loan planner views">
+        <button class="tab is-active" type="button" data-tab="planner" aria-selected="true">Plan overview</button>
+        <button class="tab" type="button" data-tab="schedule" aria-selected="false">Amortization schedule <span id="scheduleCount" class="tab-count"></span></button>
+      </nav>
+
+      <section class="tab-panel is-active" id="plannerPanel">
+        <div class="planner-grid">
+          <form class="panel terms-panel" id="loanForm">
+            <div class="panel-heading">
+              <div><p class="section-kicker">LOAN DETAILS</p><h2>Payment plan</h2></div>
+              <span class="live-pill" id="editModePill"><span></span> Owner editable</span>
             </div>
-            <span class="live-pill"><span></span> Live</span>
-          </div>
 
-          <div class="field-grid">
-            <label class="field">
-              <span>Loan amount</span>
-              <div class="input-shell"><span class="prefix">$</span><input id="loanAmount" type="number" min="0.01" step="0.01" value="5552.75" required /></div>
-            </label>
-            <label class="field">
-              <span>Interest rate</span>
-              <div class="input-shell"><input id="interestRate" type="number" min="0" step="0.01" value="10" required /><span class="suffix">%</span></div>
-            </label>
-            <label class="field">
-              <span>Term years</span>
-              <div class="input-shell"><input id="loanTermYears" type="number" min="0" step="1" value="5" required /><span class="suffix">years</span></div>
-            </label>
-            <label class="field">
-              <span>Term months</span>
-              <div class="input-shell"><input id="loanTermMonths" type="number" min="0" max="11" step="1" value="0" required /><span class="suffix">months</span></div>
-            </label>
-            <label class="field">
-              <span>Payment frequency</span>
-              <select id="frequency">
-                <option value="weekly">Weekly</option>
-                <option value="biweekly" selected>Biweekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
-            </label>
-            <label class="field field-wide">
-              <span>First payment date</span>
-              <input id="firstPaymentDate" type="date" value="2026-11-13" required />
-            </label>
-          </div>
-          <p class="form-note">Interest is calculated at the nominal annual rate divided by the selected number of payments per year.</p>
-        </form>
-
-        <aside class="panel result-panel" aria-live="polite">
-          <p class="section-kicker">CURRENT PLAN</p>
-          <div class="payment-figure">
-            <span>Regular payment</span>
-            <strong id="paymentAmount">$0.00</strong>
-            <small id="paymentFrequencyLabel">every two weeks</small>
-          </div>
-          <dl class="result-list">
-            <div><dt>Total interest</dt><dd id="totalInterest">$0.00</dd></div>
-            <div><dt>Total paid</dt><dd id="totalPaid">$0.00</dd></div>
-            <div><dt>Payoff date</dt><dd id="payoffDate">—</dd></div>
-            <div><dt>Payments</dt><dd id="paymentCount">—</dd></div>
-          </dl>
-          <div class="savings-card" id="savingsCard">
-            <span>Extra payments save</span>
-            <strong id="interestSaved">$0.00</strong>
-            <small id="timeSaved">Add an extra payment to compare</small>
-          </div>
-        </aside>
-
-        <section class="panel extras-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="section-kicker">EXTRA PAYMENTS</p>
-              <h2>Add a dated payment</h2>
+            <div class="field-grid identity-fields owner-only" id="identityFields">
+              <label class="field field-wide"><span>Loan name</span><input id="loanName" maxlength="120" required /></label>
+              <label class="field"><span>Borrower name</span><input id="borrowerName" maxlength="120" /></label>
+              <label class="field"><span>Status</span><select id="loanRecordStatus"><option value="active">Active</option><option value="paid">Paid off</option><option value="archived">Archived</option></select></label>
+              <label class="field field-wide"><span>Assigned user emails</span><input id="assignedEmails" type="text" placeholder="name@example.com, another@example.com" /><small>Separate multiple email addresses with commas.</small></label>
             </div>
-          </div>
-          <form class="extra-form" id="extraPaymentForm">
-            <label class="field"><span>Payment type</span><select id="paymentType"><option value="extra">Extra payment</option><option value="manual">Manual payment</option></select></label>
-            <label class="field"><span>Amount</span><div class="input-shell"><span class="prefix">$</span><input id="extraAmount" type="number" min="0.01" step="0.01" placeholder="250.00" required /></div></label>
-            <label class="field"><span>Date</span><input id="extraDate" type="date" required /></label>
-            <button class="button button-primary" type="submit">Record payment</button>
+
+            <div class="field-grid financial-fields">
+              <label class="field"><span>Loan amount</span><div class="input-shell"><span class="prefix">$</span><input id="loanAmount" type="number" min="0.01" step="0.01" required /></div></label>
+              <label class="field"><span>Interest rate</span><div class="input-shell"><input id="interestRate" type="number" min="0" step="0.01" required /><span class="suffix">%</span></div></label>
+              <label class="field"><span>Term years</span><div class="input-shell"><input id="loanTermYears" type="number" min="0" step="1" required /><span class="suffix">years</span></div></label>
+              <label class="field"><span>Term months</span><div class="input-shell"><input id="loanTermMonths" type="number" min="0" max="11" step="1" required /><span class="suffix">months</span></div></label>
+              <label class="field"><span>Payment frequency</span><select id="frequency"><option value="weekly">Weekly</option><option value="biweekly">Biweekly</option><option value="monthly">Monthly</option></select></label>
+              <label class="field"><span>First payment date</span><input id="firstPaymentDate" type="date" required /></label>
+            </div>
+            <div class="form-actions owner-only">
+              <button class="button button-primary" id="saveLoanButton" type="submit">Save loan details</button>
+            </div>
+            <p class="form-note" id="termsNote">Interest is calculated at the nominal annual rate divided by the selected number of payments per year.</p>
           </form>
-          <p class="form-note">An extra payment is applied on the first scheduled payment date on or after the date entered.</p>
-          <div class="extras-empty" id="extrasEmpty">No extra payments yet.</div>
-          <div class="extras-list" id="extrasList"></div>
-        </section>
-      </div>
-    </section>
 
-    <section class="tab-panel" id="schedulePanel">
-      <div class="schedule-toolbar">
-        <div>
-          <p class="section-kicker">FULL SCHEDULE</p>
-          <h2>Amortization schedule</h2>
-          <p>Extra payments are highlighted and included in the recalculated balance.</p>
+          <aside class="panel result-panel" aria-live="polite">
+            <p class="section-kicker">CURRENT PLAN</p>
+            <div class="payment-figure"><span>Regular payment</span><strong id="paymentAmount">$0.00</strong><small id="paymentFrequencyLabel">—</small></div>
+            <dl class="result-list">
+              <div><dt>Total interest</dt><dd id="totalInterest">$0.00</dd></div>
+              <div><dt>Total paid</dt><dd id="totalPaid">$0.00</dd></div>
+              <div><dt>Payoff date</dt><dd id="payoffDate">—</dd></div>
+              <div><dt>Payments</dt><dd id="paymentCount">—</dd></div>
+            </dl>
+            <div class="savings-card"><span>Recorded payments save</span><strong id="interestSaved">$0.00</strong><small id="timeSaved">Record a payment to compare</small></div>
+          </aside>
+
+          <section class="panel extras-panel">
+            <div class="panel-heading"><div><p class="section-kicker">PAYMENT LEDGER</p><h2>Record a dated payment</h2></div></div>
+            <form class="extra-form" id="extraPaymentForm">
+              <label class="field"><span>Payment type</span><select id="paymentType"><option value="extra">Extra payment</option><option value="manual">Manual payment</option></select></label>
+              <label class="field"><span>Amount</span><div class="input-shell"><span class="prefix">$</span><input id="extraAmount" type="number" min="0.01" step="0.01" placeholder="250.00" required /></div></label>
+              <label class="field"><span>Date</span><input id="extraDate" type="date" required /></label>
+              <button class="button button-primary" type="submit">Record payment</button>
+            </form>
+            <p class="form-note">A recorded payment is applied on the first scheduled payment date on or after the date entered.</p>
+            <div class="extras-empty" id="extrasEmpty">No recorded payments yet.</div>
+            <div class="extras-list" id="extrasList"></div>
+          </section>
         </div>
-        <button class="button button-secondary" type="button" id="downloadCsv">Download CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Payment date</th><th>Opening balance</th><th>Interest</th><th>Scheduled payment</th><th>Other payment</th><th>Principal</th><th>Closing balance</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody id="scheduleBody"></tbody>
-        </table>
-      </div>
-    </section>
+      </section>
+
+      <section class="tab-panel" id="schedulePanel">
+        <div class="schedule-toolbar">
+          <div><p class="section-kicker">FULL SCHEDULE</p><h2>Amortization schedule</h2><p>Recorded and missed payments are reflected in the recalculated balance.</p></div>
+          <button class="button button-secondary" type="button" id="downloadCsv">Download CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Payment date</th><th>Opening balance</th><th>Interest</th><th>Scheduled payment</th><th>Other payment</th><th>Principal</th><th>Closing balance</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <footer>Draft planning tool. Confirm the lender’s interest and payment-processing conventions before relying on the results.</footer>
+  <dialog class="loan-dialog" id="loanDialog">
+    <form id="newLoanForm">
+      <div class="dialog-heading"><div><p class="section-kicker">NEW LOAN</p><h2>Create a loan ledger</h2></div><button class="dialog-close" id="closeLoanDialog" type="button" aria-label="Close">×</button></div>
+      <div class="field-grid">
+        <label class="field field-wide"><span>Loan name</span><input id="newLoanName" maxlength="120" placeholder="Taylor's Family Loan" required /></label>
+        <label class="field"><span>Borrower name</span><input id="newBorrowerName" maxlength="120" /></label>
+        <label class="field"><span>Assigned email</span><input id="newAssignedEmails" type="email" placeholder="borrower@example.com" required /><small>This email must also be allowed by the Loan Planner policy in Cloudflare Access.</small></label>
+        <label class="field"><span>Loan amount</span><div class="input-shell"><span class="prefix">$</span><input id="newLoanAmount" type="number" min="0.01" step="0.01" required /></div></label>
+        <label class="field"><span>Interest rate</span><div class="input-shell"><input id="newInterestRate" type="number" min="0" step="0.01" value="10" required /><span class="suffix">%</span></div></label>
+        <label class="field"><span>Term years</span><input id="newTermYears" type="number" min="0" step="1" value="5" required /></label>
+        <label class="field"><span>Term months</span><input id="newTermMonths" type="number" min="0" max="11" step="1" value="0" required /></label>
+        <label class="field"><span>Payment frequency</span><select id="newFrequency"><option value="weekly">Weekly</option><option value="biweekly" selected>Biweekly</option><option value="monthly">Monthly</option></select></label>
+        <label class="field"><span>First payment date</span><input id="newFirstDate" type="date" required /></label>
+      </div>
+      <div class="dialog-actions"><button class="button button-quiet" id="cancelNewLoan" type="button">Cancel</button><button class="button button-primary" type="submit">Create loan</button></div>
+    </form>
+  </dialog>
+
+  <footer>Planning tool only. Confirm the lender’s interest and payment-processing conventions before relying on the results.</footer>
   <script src="app.js"></script>
 </body>
 </html>
-

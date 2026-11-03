@@ -1,49 +1,36 @@
 # Loan Planner
 
-A protected Cloudflare Worker application for maintaining a shared family-loan amortization schedule. Static assets and the authenticated API deploy together, while Cloudflare D1 stores the loan terms and payment-event audit trail.
+A private Cloudflare Worker application for maintaining multiple family-loan amortization schedules. Cloudflare Access authenticates each visitor, D1 stores loan assignments and payment ledgers, and the Worker enforces per-loan permissions.
 
-## Stored records
+## Roles and permissions
 
-- One shared loan record
-- Extra and manual payments
-- Missed scheduled-payment markers
-- Creator and voiding identity from Cloudflare Access
-- Creation and voiding timestamps
+- The owner can create loans, change terms, assign users, change status, and void or restore ledger entries.
+- Assigned borrowers can view their loans, record extra or manual payments, and mark scheduled payments missed.
+- Unassigned users cannot retrieve loan data.
 
-Future amortization rows are calculated rather than stored. Payment records are voided instead of deleted so the audit history remains available.
+Payment records are voided rather than deleted so their audit history remains available. Future amortization rows are calculated in the browser rather than stored.
 
-## Cloudflare setup
+## D1 setup
 
-### 1. Create and initialize D1
+For a new database:
 
 ```sh
 npm install
 npm run db:create
 npm run db:migrate:remote
+npm run db:migrate:multi-loan:remote
 ```
 
-The migration inserts the initial $5,552.75, 10%, five-year biweekly loan.
+For the original single-loan production database, apply only `migrations/0002_multi_loan.sql`. It migrates the existing loan to **Kat's Policy Loan**, assigns `katsmith430@gmail.com`, and attaches every existing payment event to that loan.
 
-### 2. Deploy the Worker
+## Deployment
 
-Connect this repository to a Cloudflare Worker build or run `npm run deploy`. Add a D1 binding to the Worker with variable name `DB` and database `policy-loan-planner`.
+Cloudflare Workers Builds deploys `main` with `npx wrangler deploy`. The Wrangler configuration includes the D1 binding, static assets, owner email, and `loan.traderclay.com` custom domain.
 
-### 3. Add the custom domain
-
-The Wrangler configuration attaches `loan.traderclay.com` as the Worker's custom domain. Because `traderclay.com` is already an active Cloudflare zone, Cloudflare can create the DNS record and certificate during deployment. Remove any existing DNS record for `loan.traderclay.com` before the first deployment if that hostname is already in use.
-
-### 4. Protect all traffic with Access
-
-In **Workers & Pages → policy-loan-planner → Access**, protect **all traffic**. Configure email one-time PIN authentication and allow only:
-
-- `csmith.ab@gmail.com`
-- `katsmith430@gmail.com`
-
-Worker-level protection covers the static files, API, custom domain, `workers.dev` hostname, and previews. The API also checks the authenticated email against `ALLOWED_EMAILS`.
+Protect all Worker traffic with Cloudflare Access. Keep a dedicated Loan Planner Access policy containing every email that should be able to reach the application. Loan assignments in D1 provide the second authorization layer and control which records each signed-in user can retrieve.
 
 ## Calculation convention
 
-The nominal annual rate is divided by the selected payment periods per year. Extra and manual payments are applied on the first scheduled payment date on or after their recorded date. A missed-payment marker disables that scheduled payment and leaves the unpaid interest in the balance.
+The nominal annual rate is divided by the selected payment periods per year. Extra and manual payments are applied on the first scheduled payment date on or after their recorded date. A missed-payment marker disables that scheduled payment and leaves unpaid interest in the balance.
 
 This is a planning tool. Confirm the lender's conventions before relying on its results.
-
