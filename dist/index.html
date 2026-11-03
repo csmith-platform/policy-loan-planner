@@ -53,8 +53,12 @@ Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' 
               <div class="input-shell"><input id="interestRate" type="number" min="0" step="0.01" value="10" required /><span class="suffix">%</span></div>
             </label>
             <label class="field">
-              <span>Loan term</span>
-              <div class="input-shell"><input id="loanTerm" type="number" min="0.1" step="0.1" value="5" required /><span class="suffix">years</span></div>
+              <span>Term years</span>
+              <div class="input-shell"><input id="loanTermYears" type="number" min="0" step="1" value="5" required /><span class="suffix">years</span></div>
+            </label>
+            <label class="field">
+              <span>Term months</span>
+              <div class="input-shell"><input id="loanTermMonths" type="number" min="0" max="11" step="1" value="0" required /><span class="suffix">months</span></div>
             </label>
             <label class="field">
               <span>Payment frequency</span>
