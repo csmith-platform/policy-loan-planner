@@ -5,7 +5,7 @@ A responsive, browser-based loan amortization calculator with support for dated 
 
 ## Features
 
-- Configurable loan amount, interest rate, term, payment frequency, and first payment date
+- Configurable loan amount, interest rate, term in years and months, payment frequency, and first payment date
 - Live payment, interest, payoff date, and payment-count summaries
 - Full amortization schedule
 - Multiple dated extra payments with automatic schedule recalculation
