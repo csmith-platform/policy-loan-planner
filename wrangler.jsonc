@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "policy-loan-planner",
+  "main": "./src/worker.js",
+  "compatibility_date": "2026-11-02",
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "vars": {
+    "OWNER_EMAIL": "csmith.ab@gmail.com",
+    "ALLOWED_EMAILS": "csmith.ab@gmail.com,katsmith430@gmail.com"
+  },
+  "observability": { "enabled": true }
+}
+
