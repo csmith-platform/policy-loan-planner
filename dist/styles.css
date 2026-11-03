@@ -60,7 +60,7 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 .suffix { padding-right: 14px; white-space: nowrap; }
 .form-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 
-.result-panel { padding: 30px; background: var(--green-dark); color: white; border-color: var(--green-dark); position: sticky; top: 96px; }
+.result-panel { padding: 30px; background: var(--green-dark); color: white; border-color: var(--green-dark); position: sticky; top: 96px; grid-column: 2; grid-row: 1 / span 2; align-self: start; }
 .result-panel .section-kicker { color: #a9d7c5; }
 .payment-figure { display: grid; gap: 5px; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,.15); }
 .payment-figure span { color: #c5d8d1; font-size: 13px; }
@@ -75,7 +75,7 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 .savings-card strong { font-size: 24px; }
 .savings-card small { color: #a9c4ba; }
 
-.extras-panel { grid-column: 1 / -1; }
+.extras-panel { grid-column: 1; }
 .extra-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; align-items: end; }
 .button { min-height: 42px; border-radius: 10px; border: 1px solid transparent; padding: 0 16px; font-weight: 750; }
 .button-primary { height: 50px; background: var(--green); color: white; }
@@ -111,7 +111,7 @@ footer { padding: 26px 20px 45px; text-align: center; color: var(--muted); font-
   main { width: min(100% - 24px, 1180px); }
   .hero { padding-top: 48px; }
   .planner-grid { grid-template-columns: 1fr; }
-  .result-panel { position: static; }
+  .result-panel { position: static; grid-column: auto; grid-row: auto; }
   .extras-panel { grid-column: auto; }
   .extra-form { grid-template-columns: 1fr; }
   .field-grid { grid-template-columns: 1fr; }
