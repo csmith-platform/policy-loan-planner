@@ -1,0 +1,136 @@
+Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Interactive loan amortization planner with dated extra payments." />
+  <title>Loan Planner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">LP</span>
+      <div>
+        <strong>Loan Planner</strong>
+        <span>Clear payments. Flexible payoff.</span>
+      </div>
+    </div>
+    <button class="button button-quiet" id="resetButton" type="button">Reset plan</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">LOAN CALCULATOR</p>
+      <h1>See every payment, then see what an extra payment changes.</h1>
+      <p class="hero-copy">Set the loan terms, add one or more dated extra payments, and the full schedule recalculates instantly.</p>
+    </section>
+
+    <nav class="tabs" aria-label="Loan planner views">
+      <button class="tab is-active" type="button" data-tab="planner" aria-selected="true">Plan overview</button>
+      <button class="tab" type="button" data-tab="schedule" aria-selected="false">Amortization schedule <span id="scheduleCount" class="tab-count"></span></button>
+    </nav>
+
+    <section class="tab-panel is-active" id="plannerPanel">
+      <div class="planner-grid">
+        <form class="panel terms-panel" id="loanForm">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">LOAN DETAILS</p>
+              <h2>Build the payment plan</h2>
+            </div>
+            <span class="live-pill"><span></span> Live</span>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Loan amount</span>
+              <div class="input-shell"><span class="prefix">$</span><input id="loanAmount" type="number" min="0.01" step="0.01" value="5552.75" required /></div>
+            </label>
+            <label class="field">
+              <span>Interest rate</span>
+              <div class="input-shell"><input id="interestRate" type="number" min="0" step="0.01" value="10" required /><span class="suffix">%</span></div>
+            </label>
+            <label class="field">
+              <span>Loan term</span>
+              <div class="input-shell"><input id="loanTerm" type="number" min="0.1" step="0.1" value="5" required /><span class="suffix">years</span></div>
+            </label>
+            <label class="field">
+              <span>Payment frequency</span>
+              <select id="frequency">
+                <option value="weekly">Weekly</option>
+                <option value="biweekly" selected>Biweekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </label>
+            <label class="field field-wide">
+              <span>First payment date</span>
+              <input id="firstPaymentDate" type="date" value="2026-11-13" required />
+            </label>
+          </div>
+          <p class="form-note">Interest is calculated at the nominal annual rate divided by the selected number of payments per year.</p>
+        </form>
+
+        <aside class="panel result-panel" aria-live="polite">
+          <p class="section-kicker">CURRENT PLAN</p>
+          <div class="payment-figure">
+            <span>Regular payment</span>
+            <strong id="paymentAmount">$0.00</strong>
+            <small id="paymentFrequencyLabel">every two weeks</small>
+          </div>
+          <dl class="result-list">
+            <div><dt>Total interest</dt><dd id="totalInterest">$0.00</dd></div>
+            <div><dt>Total paid</dt><dd id="totalPaid">$0.00</dd></div>
+            <div><dt>Payoff date</dt><dd id="payoffDate">—</dd></div>
+            <div><dt>Payments</dt><dd id="paymentCount">—</dd></div>
+          </dl>
+          <div class="savings-card" id="savingsCard">
+            <span>Extra payments save</span>
+            <strong id="interestSaved">$0.00</strong>
+            <small id="timeSaved">Add an extra payment to compare</small>
+          </div>
+        </aside>
+
+        <section class="panel extras-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">EXTRA PAYMENTS</p>
+              <h2>Add a dated payment</h2>
+            </div>
+          </div>
+          <form class="extra-form" id="extraPaymentForm">
+            <label class="field"><span>Amount</span><div class="input-shell"><span class="prefix">$</span><input id="extraAmount" type="number" min="0.01" step="0.01" placeholder="250.00" required /></div></label>
+            <label class="field"><span>Date</span><input id="extraDate" type="date" required /></label>
+            <button class="button button-primary" type="submit">Add extra payment</button>
+          </form>
+          <p class="form-note">An extra payment is applied on the first scheduled payment date on or after the date entered.</p>
+          <div class="extras-empty" id="extrasEmpty">No extra payments yet.</div>
+          <div class="extras-list" id="extrasList"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="schedulePanel">
+      <div class="schedule-toolbar">
+        <div>
+          <p class="section-kicker">FULL SCHEDULE</p>
+          <h2>Amortization schedule</h2>
+          <p>Extra payments are highlighted and included in the recalculated balance.</p>
+        </div>
+        <button class="button button-secondary" type="button" id="downloadCsv">Download CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Payment date</th><th>Opening balance</th><th>Interest</th><th>Scheduled payment</th><th>Extra payment</th><th>Principal</th><th>Closing balance</th></tr></thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>Draft planning tool. Confirm the lender’s interest and payment-processing conventions before relying on the results.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
+
