@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 const $ = (id) => document.getElementById(id);
 const frequencyConfig = {
   weekly: { periods: 52, label: "every week" },
